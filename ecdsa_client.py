@@ -120,7 +120,7 @@ def client_program(curve,m):
 
 
 if __name__ == '__main__':
-    dataset = pd.read_csv(r'C:\Users\Enrique\Downloads\Cripto Reto\Client\Prosumer_ABC.csv', header = 0, sep = ";")
+    dataset = pd.read_csv(r'Prosumer_ABC.csv', header = 0, sep = ";")
     curve = registry.get_curve('brainpoolP256r1')
     #m = pickle.dumps(dataset.iloc[0:5], protocol=4)
     m = dataset.iloc[0:5]
