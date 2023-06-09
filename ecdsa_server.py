@@ -47,19 +47,17 @@ def firmado_dsa(curve, m):
     r = kP.x % q 
     l = alg_euc_ext(q, k)[2] # inverso de k
     s = (l*(h + x*r))%q 
-  return [curve, r, s, Q, m]
-
-
-# Firmado y lista con la curva, r, s y Q
+  return  r, s, Q, m
+    
+#Firmado y lista con la curva, r, s y Q
 def firmado_df(df):
   a = []
-  for i in df.index:
+  for i in df.index: #firmado para cada registro
     curve = registry.get_curve('brainpoolP256r1')
     m = pickle.dumps(df.iloc[i].to_numpy(), protocol=4)
-    r,s,Q,h = firmado_dsa(curve, m)
+    r,s,Q,m = firmado_dsa(curve, m)
     a.append([curve, r,s,Q,m])
   return a
-
 
 def verificado_dsa(curve, r, s, Q, m):
     #curve, r, s, Q, h = data[0], data[1], data[2], data[3], data[4]
@@ -102,30 +100,27 @@ def server_program():
   print('Socket is listening...')
   conn, address = server_socket.accept()  # accept new connection
   print("Connection from: " + str(address))
-  #while True:
-  # receive data stream. it won't accept data packet greater than 1024 bytes
-  decision = pickle.loads(conn.recv(65507), encoding='bytes')
-  print("Cliente: " + str(decision))
 
   #-----------------------------Envio de mensajes--------------------
   i = 0
   while i < 2:
+    # receive data stream. it won't accept data packet greater than 1024 bytes
+    decision = pickle.loads(conn.recv(65507), encoding='bytes')
+    print("Cliente: " + str(decision))
+
     if decision == 'F':
       par = pickle.loads(conn.recv(65507), encoding='bytes')
-      #par = conn.recv(65507).decode()
-      #par = conn.recv(65507)
-      #print(par)
-      print('Recived message')
-            #print('Servidor: verificacion')
-      print(pickle.loads(par[0][4], encoding = 'bytes')) 
+      print('Recived message:')
+      print(pickle.loads(par[0][4], encoding = 'bytes'), '\n') 
       print(ver_df(par))
       conn.send(ver_df(par).encode())  # enviar verificación al cliente
-      print('Sended verification')
 
     elif decision == 'V': # servidor como firmado, cliente como verificación
-      curve = registry.get_curve('brainpoolP256r1')
-      m = pickle.dumps('hola', protocol=4)
-      r = firmado_dsa(curve, m)
+
+      dataset = pd.read_csv(r'Prosumer_ABC.csv', header = 0, sep = ";") #Change to get the data from database
+      #curve = registry.get_curve('brainpoolP256r1')
+      m = dataset.iloc[0:2]
+      r = firmado_df(m)
       message = pickle.dumps(r, protocol=4) 
       conn.send(message)  # enviar firmado
       ver = conn.recv(65507).decode() # recibir verificacion

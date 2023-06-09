@@ -59,9 +59,8 @@ def firmado_df(df):
     a.append([curve, r,s,Q,m])
   return a
 
-
-def verificado_dsa(data):
-    curve, r, s, Q, m = data[0], data[1], data[2], data[3], data[4]
+def verificado_dsa(curve, r, s, Q, m):
+    #curve, r, s, Q, h = data[0], data[1], data[2], data[3], data[4]
     #Generaicón de clave
     q = curve.field.n
     P = curve.g
@@ -78,11 +77,11 @@ def verificado_dsa(data):
         else:
           return 'Se rechaza la firma'
     else:
-        return 'Error: no cumple con 1<=r, s<=q-1'
+    	return 'Error: no cumple con 1<=r, s<=q-1'
 
-# Verificación firma por cada registro
+# Verificación firma para cada registro
 def ver_df(a):
-  for i in range(len(a)): 
+  for i in range(len(a)):
     return verificado_dsa(a[i][0],a[i][1],a[i][2],a[i][3],a[i][4])
 
 
@@ -100,7 +99,7 @@ def client_program(m, curve = None):
     #-----------------------------Envio de mensajes--------------------
     i = 0
     while i<1:
-        decision = input('\n\n Send (F) \nReceive (V) \nEnd \nSelect your action: \n---------------') #Preguntar
+        decision = input('\nActions:\n-Send (F) \n-Receive (V) \n-End \nSelect your action:\n') #Preguntar
         message = pickle.dumps(decision, protocol=4) 
         client_socket.send(message)  # send message 
 
@@ -114,8 +113,10 @@ def client_program(m, curve = None):
             
         elif decision == 'V': # cliente como verificador
             data = pickle.loads(client_socket.recv(65507), encoding='bytes') # recibir parámetros firmado
-            client_socket.send(verificado_dsa(data).encode())  # enviar verificación
-            print('Cliente: verificador')
+            print('Recived message:')
+            print(pickle.loads(data[0][4], encoding = 'bytes'), '\n')
+            client_socket.send(ver_df(data).encode())  # enviar verificación
+            print('Cliente: verificador',ver_df(data) )
 
         else: #terminar iteraciones
           i = i + 1
@@ -127,6 +128,5 @@ if __name__ == '__main__':
     #base de datos
     dataset = pd.read_csv(r'Prosumer_ABC.csv', header = 0, sep = ";")
     #curve = registry.get_curve('brainpoolP256r1')
-    #m = pickle.dumps(dataset.iloc[0:5], protocol=4)
     m = dataset.iloc[0:2]
     client_program(m)
