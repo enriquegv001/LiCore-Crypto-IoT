@@ -47,7 +47,7 @@ def firmado_dsa(curve, m):
     r = kP.x % q 
     l = alg_euc_ext(q, k)[2] # inverso de k
     s = (l*(h + x*r))%q 
-  return [curve, r, s, Q, h]
+  return [curve, r, s, Q, m]
 
 
 # Firmado y lista con la curva, r, s y Q
@@ -57,11 +57,11 @@ def firmado_df(df):
     curve = registry.get_curve('brainpoolP256r1')
     m = pickle.dumps(df.iloc[i].to_numpy(), protocol=4)
     r,s,Q,h = firmado_dsa(curve, m)
-    a.append([curve, r,s,Q,h])
+    a.append([curve, r,s,Q,m])
   return a
 
 
-def verificado_dsa(curve, r, s, Q, h):
+def verificado_dsa(curve, r, s, Q, m):
     #curve, r, s, Q, h = data[0], data[1], data[2], data[3], data[4]
     #Generaicón de clave
     q = curve.field.n
@@ -70,6 +70,7 @@ def verificado_dsa(curve, r, s, Q, h):
     #Verificación de la firma
     if 1<=r and 1<=s and r<=(q-1) and s<=(q-1):
         w = alg_euc_ext(curve.field.n, s)[2] # invserso s
+        h = int(hashlib.sha512(m).hexdigest(),16)
         u1 = h * w % q
         u2 = r * w % q
         v = (u1*P + u2*Q).x%q
@@ -84,7 +85,6 @@ def verificado_dsa(curve, r, s, Q, h):
 def ver_df(a):
   for i in range(len(a)):
     return verificado_dsa(a[i][0],a[i][1],a[i][2],a[i][3],a[i][4])
-
 
 def server_program():
   # get the hostname
@@ -105,28 +105,34 @@ def server_program():
   decision = pickle.loads(conn.recv(65507), encoding='bytes')
   print("Cliente: " + str(decision))
 
-  if decision == 'f':
-    par = pickle.loads(conn.recv(65507), encoding='bytes')
-    #par = conn.recv(65507).decode()
-    #par = conn.recv(65507)
-    #print(par)
-    print('Recived message')
-          #print('Servidor: verificacion')
-    print(ver_df(par))
-    conn.send(ver_df(par).encode())  # enviar verificación al cliente
-    print('Sended verification')
+  i = 0
+  while i < 2:
+    if decision == 'F':
+      par = pickle.loads(conn.recv(65507), encoding='bytes')
+      #par = conn.recv(65507).decode()
+      #par = conn.recv(65507)
+      #print(par)
+      print('Recived message')
+            #print('Servidor: verificacion')
+      print(pickle.loads(par[0][4], encoding = 'bytes')) 
+      print(ver_df(par))
+      conn.send(ver_df(par).encode())  # enviar verificación al cliente
+      print('Sended verification')
 
-  else: # servidor como firmado, cliente como verificación
-    curve = registry.get_curve('brainpoolP256r1')
-    m = pickle.dumps('hola', protocol=4)
-    r = firmado_dsa(curve, m)
-    message = pickle.dumps(r, protocol=4) 
-    conn.send(message)  # enviar firmado
-    ver = conn.recv(65507).decode() # recibir verificacion
-    print('Servidor: firmado')
-    print("Cliente verificación: " + str(ver))
+    elif decision == 'V': # servidor como firmado, cliente como verificación
+      curve = registry.get_curve('brainpoolP256r1')
+      m = pickle.dumps('hola', protocol=4)
+      r = firmado_dsa(curve, m)
+      message = pickle.dumps(r, protocol=4) 
+      conn.send(message)  # enviar firmado
+      ver = conn.recv(65507).decode() # recibir verificacion
+      print('Servidor: firmado')
+      print("Cliente verificación: " + str(ver))
+    
+    
+    else:
+      i=i +1
+
   conn.close()  # close the connection
-
-
 if __name__ == '__main__':
     server_program()

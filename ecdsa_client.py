@@ -47,7 +47,7 @@ def firmado_dsa(curve, m):
     r = kP.x % q 
     l = alg_euc_ext(q, k)[2] # inverso de k
     s = (l*(h + x*r))%q 
-  return  r, s, Q, h
+  return  r, s, Q, m
     
 #Firmado y lista con la curva, r, s y Q
 def firmado_df(df):
@@ -55,14 +55,14 @@ def firmado_df(df):
   for i in df.index:
     curve = registry.get_curve('brainpoolP256r1')
     m = pickle.dumps(df.iloc[i].to_numpy(), protocol=4)
-    r,s,Q,h = firmado_dsa(curve, m)
-    a.append([curve, r,s,Q,h])
+    r,s,Q,m = firmado_dsa(curve, m)
+    a.append([curve, r,s,Q,m])
   return a
 
 
 
 def verificado_dsa(data):
-    curve, r, s, Q, h = data[0], data[1], data[2], data[3], data[4]
+    curve, r, s, Q, m = data[0], data[1], data[2], data[3], data[4]
     #Generaicón de clave
     q = curve.field.n
     P = curve.g
@@ -70,6 +70,7 @@ def verificado_dsa(data):
     #Verificación de la firma
     if 1<=r and 1<=s and r<=(q-1) and s<=(q-1):
         w = alg_euc_ext(curve.field.n, s)[2] # invserso s
+        h = int(hashlib.sha512(m).hexdigest(),16)
         u1 = h * w % q
         u2 = r * w % q
         v = (u1*P + u2*Q).x%q
@@ -96,12 +97,12 @@ def client_program(curve,m):
     print('Socket conectado')
     i = 0
     while i<2:
-        decision = input('Firmado (f) o verificacion (v): ')
+        decision = input('Send (F) \nReceive (V) \nEnd \nSelect your action:')
         message = pickle.dumps(decision, protocol=4) # '[100,0]'
         client_socket.send(message)  # send message 
 
-        if decision == 'f': # cliente como firmado
-            r = firmado_df(m)
+        if decision == 'F': # cliente como firmado
+            r = firmado_df(m) 
             #message = firmado_df(m).encode()
             message = pickle.dumps(r, protocol=4) 
             client_socket.send(message)  # enviar firmado
@@ -109,12 +110,13 @@ def client_program(curve,m):
             print('Cliente: firmado')
             print('Servidor verificación: ' + str(ver))  # show in terminal
             
-        else: # cliente como verificador
+        elif decision == 'V': # cliente como verificador
             data = pickle.loads(client_socket.recv(65507), encoding='bytes') # recibir parámetros firmado
             client_socket.send(verificado_dsa(data).encode())  # enviar verificación
             print('Cliente: verificador')
-        
-        i = i + 1
+
+        else:
+          i = i + 1
 
     client_socket.close()  # close the connection
 
@@ -123,5 +125,5 @@ if __name__ == '__main__':
     dataset = pd.read_csv(r'Prosumer_ABC.csv', header = 0, sep = ";")
     curve = registry.get_curve('brainpoolP256r1')
     #m = pickle.dumps(dataset.iloc[0:5], protocol=4)
-    m = dataset.iloc[0:5]
+    m = dataset.iloc[0:2]
     client_program(curve, m)
