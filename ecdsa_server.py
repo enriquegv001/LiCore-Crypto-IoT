@@ -6,7 +6,8 @@ import secrets
 import hashlib
 import pandas as pd
 
-def alg_euc_ext(a,b):
+#============================Algoritmos para EC-DSA=====================
+def alg_euc_ext(a,b): # obtener inverso de a, del grupo b 
     if b == 0:
         d = a; x = 1; y =0
         return d,x, y
@@ -25,8 +26,7 @@ def alg_euc_ext(a,b):
         y2 = y1
         y1 = y
         
-    d = a; x = x2; y = y2
-    # y es inverso de a
+    d = a; x = x2; y = y2 # y es el inverso 
     return d,x,y
 
 def firmado_dsa(curve, m):
@@ -81,11 +81,13 @@ def verificado_dsa(curve, r, s, Q, m):
     else:
     	return 'Error: no cumple con 1<=r, s<=q-1'
 
-# Verificación firma
+# Verificación firma para cada registro
 def ver_df(a):
   for i in range(len(a)):
     return verificado_dsa(a[i][0],a[i][1],a[i][2],a[i][3],a[i][4])
 
+
+#============================Conexión SSL/TLS=========================
 def server_program():
   # get the hostname
   host = socket.gethostname()#'172.31.87.162'
@@ -105,6 +107,7 @@ def server_program():
   decision = pickle.loads(conn.recv(65507), encoding='bytes')
   print("Cliente: " + str(decision))
 
+  #-----------------------------Envio de mensajes--------------------
   i = 0
   while i < 2:
     if decision == 'F':
@@ -130,7 +133,7 @@ def server_program():
       print("Cliente verificación: " + str(ver))
     
     
-    else:
+    else: #terminar iteraciones
       i=i +1
 
   conn.close()  # close the connection
