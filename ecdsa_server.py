@@ -1,4 +1,5 @@
 import socket
+import ssl
 import tinyec
 from tinyec import registry
 import pickle
@@ -85,23 +86,8 @@ def ver_df(a):
     return verificado_dsa(a[i][0],a[i][1],a[i][2],a[i][3],a[i][4])
 
 
-#============================Conexión SSL/TLS=========================
-def server_program():
-  # get the hostname
-  host = socket.gethostname()#'172.31.87.162'
-  port = 5000  # initiate port no above 1024
-
-  server_socket = socket.socket()  # get instance
-  # look closely. The bind() function takes tuple as argument
-  server_socket.bind((host, port))  # bind host address and port together
-  print('bind socket')
-  # configure how many client the server can listen simultaneously
-  server_socket.listen(2)
-  print('Socket is listening...')
-  conn, address = server_socket.accept()  # accept new connection
-  print("Connection from: " + str(address))
-
-  #-----------------------------Envio de mensajes--------------------
+def info_exchange(conn):
+     #-----------------------------Envio de mensajes--------------------
   i = 0
   while i < 2:
     # receive data stream. it won't accept data packet greater than 1024 bytes
@@ -127,10 +113,53 @@ def server_program():
       print('Servidor: firmado')
       print("Cliente verificación: " + str(ver))
     
-    
     else: #terminar iteraciones
       i=i +1
 
+
+#============================Conexión SSL/TLS=========================
+def server_program():
+  # get the hostname
+  host = socket.gethostname()#'172.31.87.162'
+  port = 5000  # initiate port no above 1024
+
+  server_socket = socket.socket()  # get instance
+  # look closely. The bind() function takes tuple as argument
+  server_socket.bind((host, port))  # bind host address and port together
+  print('bind socket')
+  # configure how many client the server can listen simultaneously
+  server_socket.listen(2)
+  print('Socket is listening...')
+  conn, address = server_socket.accept()  # accept new connection
+  print("Connection from: " + str(address))
+
+  info_exchange(conn)
+    
+  server_socket.close()
+    
+
+def server_tls():
+  context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
+  context.load_cert_chain('/home/ec2-user/root/tls/certs/ec-cacert.pem', '/home/ec2-user/root/tls/private/ec-cakey.pem')
+  with socket.socket(socket.AF_INET, socket.SOCK_STREAM, 0) as sock:
+          sock.bind(('172.31.93.163', 1234))
+          sock.listen(5)
+          print('Server listening...')
+          with context.wrap_socket(sock, server_side=True) as ssock:
+                  print('Socket warpped')
+                  conn, addr = ssock.accept()
+
+                  print('Client with: ', addr)
+                  #print('Data received')
+                  #data = conn.recv(1024)
+                  #print('Client says: ', data.decode())
+                  #conn.send('thanks!'.encode())
+                  info_exchange(conn)
+                  
+                  ssock.close()
+          sock.close()
+
   conn.close()  # close the connection
 if __name__ == '__main__':
-    server_program()
+    #server_program()
+    server_tls()

@@ -1,4 +1,5 @@
 import socket
+import ssl
 import tinyec
 from tinyec import registry
 import pickle
@@ -84,44 +85,64 @@ def ver_df(a):
   for i in range(len(a)):
     return verificado_dsa(a[i][0],a[i][1],a[i][2],a[i][3],a[i][4])
 
+def info_exchange(client_socket):
+#-----------------------------Envio de mensajes--------------------
+  i = 0
+  while i<1:
+      decision = input('\nActions:\n-Send (F) \n-Receive (V) \n-End \nSelect your action:\n') #Preguntar
+      message = pickle.dumps(decision, protocol=4) 
+      client_socket.send(message)  # send message 
+
+      if decision == 'F': # cliente como firmado
+          r = firmado_df(m) 
+          message = pickle.dumps(r, protocol=4) 
+          client_socket.send(message)  # enviar firmado
+          ver = client_socket.recv(65507).decode() # recibir verificacion
+          print('Cliente: firmado')
+          print('Servidor verificación: ' + str(ver))  # show in terminal
+          
+      elif decision == 'V': # cliente como verificador
+          data = pickle.loads(client_socket.recv(65507), encoding='bytes') # recibir parámetros firmado
+          print('Recived message:')
+          print(pickle.loads(data[0][4], encoding = 'bytes'), '\n')
+          client_socket.send(ver_df(data).encode())  # enviar verificación
+          print('Cliente: verificador',ver_df(data) )
+
+      else: #terminar iteraciones
+        i = i + 1
 
 #============================Conexión SSL/TLS=========================
-def client_program(m, curve = None):
-    host = socket.gethostname()#'131.178.102.128' #'44.203.90.217'  # as both code is running on same pc
-    port = 5000  # socket server port number
+def client_program(m, curve = None): #conexión sin TLS
+  host = socket.gethostname()#'131.178.102.128' #'44.203.90.217'  # as both code is running on same pc
+  port = 5000  # socket server port number
 
-    client_socket = socket.socket()  # instantiate
-    print('Socket creado')
-    client_socket.connect((host, port))  # connect to the server
-    print('Socket conectado')
+  client_socket = socket.socket()  # instantiate
+  print('Socket creado')
+  client_socket.connect((host, port))  # connect to the server
+  print('Socket conectado')
+  info_exchange(client_socket)
+  client_socket.close()  # close the connection
 
 
-    #-----------------------------Envio de mensajes--------------------
-    i = 0
-    while i<1:
-        decision = input('\nActions:\n-Send (F) \n-Receive (V) \n-End \nSelect your action:\n') #Preguntar
-        message = pickle.dumps(decision, protocol=4) 
-        client_socket.send(message)  # send message 
+def client_tls(): 
+  #hostname = "ec2-44-204-5-126.compute-1.amazonaws.com"
+  hostname = "ec2-35-175-217-227.compute-1.amazonaws.com"
 
-        if decision == 'F': # cliente como firmado
-            r = firmado_df(m) 
-            message = pickle.dumps(r, protocol=4) 
-            client_socket.send(message)  # enviar firmado
-            ver = client_socket.recv(65507).decode() # recibir verificacion
-            print('Cliente: firmado')
-            print('Servidor verificación: ' + str(ver))  # show in terminal
-            
-        elif decision == 'V': # cliente como verificador
-            data = pickle.loads(client_socket.recv(65507), encoding='bytes') # recibir parámetros firmado
-            print('Recived message:')
-            print(pickle.loads(data[0][4], encoding = 'bytes'), '\n')
-            client_socket.send(ver_df(data).encode())  # enviar verificación
-            print('Cliente: verificador',ver_df(data) )
-
-        else: #terminar iteraciones
-          i = i + 1
-
-    client_socket.close()  # close the connection
+  context = ssl.create_default_context()
+  #context.load_verify_locations('C:\\Users\\Enrique\\Downloads\\ec-cacert.pem')
+  context.load_verify_locations('C:\\Users\\Enrique\\Downloads\\Cripto Reto\\Client\\new\\ec-cacert-inst4.pem')
+  sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+  print('socket creado')
+  ssock = context.wrap_socket(sock, server_hostname=hostname)
+  #ssock = ssl.wrap_socket(sock, certfile = 'ec-cacert.pem')
+  print('socket warpped')
+  ssock.connect((hostname, 1234))
+  print('Socket version: ', ssock.version())
+  #ssock.send("test".encode())
+  #print(ssock.recv(1000).decode())
+  #ssock.send()
+  info_exchange(ssock)
+  #it will close by server
 
 
 if __name__ == '__main__':
@@ -129,4 +150,5 @@ if __name__ == '__main__':
     dataset = pd.read_csv(r'Prosumer_ABC.csv', header = 0, sep = ";")
     #curve = registry.get_curve('brainpoolP256r1')
     m = dataset.iloc[0:2]
-    client_program(m)
+    #client_program(m)
+    client_tls()
