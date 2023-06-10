@@ -113,8 +113,9 @@ def info_exchange(client_socket):
 
 #============================Conexión SSL/TLS=========================
 def client_program(m, curve = None): #conexión sin TLS
-  host = socket.gethostname()#'131.178.102.128' #'44.203.90.217'  # as both code is running on same pc
-  port = 5000  # socket server port number
+  #host = socket.gethostname()#'131.178.102.128' #'44.203.90.217'  # as both code is running on same pc
+  host = "ec2-3-91-204-15.compute-1.amazonaws.com"
+  port = 1234  # socket server port number
 
   client_socket = socket.socket()  # instantiate
   print('Socket creado')
@@ -126,7 +127,9 @@ def client_program(m, curve = None): #conexión sin TLS
 
 def client_tls(): 
   #hostname = "ec2-44-204-5-126.compute-1.amazonaws.com"
-  hostname = "ec2-35-175-217-227.compute-1.amazonaws.com"
+  #hostname = "ec2-35-175-217-227.compute-1.amazonaws.com"
+  hostname = "ec2-3-91-204-15.compute-1.amazonaws.com"
+  
 
   context = ssl.create_default_context()
   #context.load_verify_locations('C:\\Users\\Enrique\\Downloads\\ec-cacert.pem')

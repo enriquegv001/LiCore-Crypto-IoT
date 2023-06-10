@@ -120,8 +120,9 @@ def info_exchange(conn):
 #============================Conexión SSL/TLS=========================
 def server_program():
   # get the hostname
-  host = socket.gethostname()#'172.31.87.162'
-  port = 5000  # initiate port no above 1024
+  #host = socket.gethostname()#'172.31.87.162'
+  host = "172.31.93.163"
+  port = 1234  # initiate port no above 1024
 
   server_socket = socket.socket()  # get instance
   # look closely. The bind() function takes tuple as argument
@@ -161,5 +162,5 @@ def server_tls():
 
   conn.close()  # close the connection
 if __name__ == '__main__':
-    #server_program()
-    server_tls()
+    server_program()
+    #server_tls()
