@@ -1,0 +1,5 @@
+#Local2ec ecdsa_server.py
+scp -i ec2-instance1.pem "C:\Users\Enrique\OneDrive - Instituto Tecnologico y de Estudios Superiores de Monterrey\Documents\Escuela\FJ23\Algebra moderna Cripto\reto\Reto-Git\LiCore-Crypto-IoT\Client_server\ecdsa_server.py" ec2-instance1@54.210.3.10:
+
+#ec2local ca-cert.pem
+scp -i ec2-instance1.pem ec2-instance1@54.210.3.10:/home/ec2-user/root/tls/certs/ec-cacert.pem  "C:\Users\Enrique\OneDrive - Instituto Tecnologico y de Estudios Superiores de Monterrey\Documents\Escuela\FJ23\Algebra moderna Cripto\reto\Reto-Git\LiCore-Crypto-IoT\Complementary code\ecdsa_server.py"
