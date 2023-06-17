@@ -117,70 +117,8 @@ def info_exchange(conn):
     print("\n Cliente: " + str(decision))
 
     if decision == 'F':  
-      #mess_nopikle = conn.recv(65507)
-      #print(len(mess_nopikle))
-      #print(mess_nopikle.decode())
-      """
-      data = []
-      packet = conn.recv(65507)
-      data.append(packet)
-      packet = conn.recv(65507)
-      data.append(packet)
-      packet = conn.recv(65507)
-      data.append(packet)
-      packet = conn.recv(65507)
-      data.append(packet)
-      
-      mess1 = b"".join(data)
-      print ('\n\n\nLongitud:', len(mess1))
-      """
-
-      """
-      print(len(mess1))
-      mess_F = []
-      z = 1
-      while z<2:
-          packet = conn.recv(65507)
-          if not packet: break
-          mess_F.append(packet)
-          z = z + 1
-      print(len(b"".join(mess_F)))
-      data_arr = pickle.loads(b"".join(mess_F))
-      print (data_arr)
-
-
-      data = []
-      while True:
-          packet = conn.recv(16384)
-          if not packet: break
-          data.append(packet)
-      par = pickle.loads(b"".join(data))
-      print (par.decode())
-      """
-
-      
-      """
-      print(len(mess1))
-
-
-      #Por si el buffer comienza a fallar
-
-      mess1 = b''
-      while 1:
-              try:
-                  mess1 += conn.recv(4096)
-              except socket.error as e:
-                  if mess1:
-                      break
-                  else:
-                    e
-      """
-  
       mess1 = conn.recv(65507)
       par = pickle.loads(mess1, encoding='bytes')
-      #par = conn.recv(65507).decode()
-      #print('Message received')
-      #print(ver_df(par))
       conn.send(ver_df(par).encode())  # enviar verificación al cliente
       
 
@@ -189,17 +127,39 @@ def info_exchange(conn):
       curve, r, s, Q, m = query
       print('query: ',pickle.loads(m, encoding='bytes'), '\n')
       print(verificado_dsa(curve, r, s, Q, m))
-      Cursor.execute(pickle.loads(m, encoding='bytes'))
-      res = Cursor.fetchall()
-      #print(res)
-
+      try:
+        Cursor.execute(pickle.loads(m, encoding='bytes'))
+        res = Cursor.fetchall()
+        
+      except:
+         res = 'Query se ingreso mal'
+         print('Query se ingreso mal')
+         
       #dataset = pd.read_csv(r'Prosumer_ABC.csv', header = 0, sep = ";") #Change to get the data from database
       #m = dataset.iloc[0:2]
       curve = registry.get_curve('brainpoolP256r1')
       res = pickle.dumps(res, protocol=4)
+  
       message = pickle.dumps(firmado_dsa(curve, res), protocol=4)
-      conn.send(message)  # enviar firmado
+
+      #Si es mensaje mayor el que el buffer size entonces dividir en n cantidades
+      bytes_len = len(message)
+      if bytes_len <= 65507:
+        n = 1
+      else:
+        n = int(bytes_len / 65507) 
+      conn.send(str(n).encode())
+
+      #se envía por partes de tamaño igual
+      conn.send(message[:65507])
+      for i in range(1, n+1):
+         m_inter = message[65507*i:65507*(i+1)] #selecciona intermedios
+         conn.send(m_inter)
+      conn.send(message[65507*n:])
       print('message sended')
+
+
+     # conn.send(message)  # enviar firmado
 
     else: #terminar iteraciones
       i=i +1
@@ -242,10 +202,9 @@ def server_tls(host, port):
 
 
 if __name__ == '__main__':
-    #host_private = '172.31.91.197'
-    #host_private = socket.gethostname()
-    host_private = '172.31.91.109'
-    print(host_private)
+    host_private = socket.gethostname() #local
+    #host_private = '172.31.91.109' # ec2
+    
     port = 1234
 
     DataBase = SQLC.connect(
@@ -258,5 +217,5 @@ if __name__ == '__main__':
     # Cursor a la database
     Cursor = DataBase.cursor()
 
-    #server_program(host_private, port)
-    server_tls(host_private, port)
+    server_program(host_private, port) #no tls
+    #server_tls(host_private, port)

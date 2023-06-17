@@ -103,7 +103,7 @@ def info_exchange(client_socket, dataframe):
           """ 
           message = pickle.dumps(firmado_df(dataframe) , protocol=4) 
           #message = firmado_df(m).encode(), 
-          print(len(message))
+          #print(len(message))
           client_socket.send(message)  # enviar firmado
           ver = client_socket.recv(65507).decode() # recibir verificacion
           print('Cliente: firmado')
@@ -115,15 +115,35 @@ def info_exchange(client_socket, dataframe):
           message = pickle.dumps(firmado_dsa(query), protocol=4)
           client_socket.send(message)
 
-          #recibir datos
-          curve, r, s, Q, m  = pickle.loads(client_socket.recv(65507), encoding='bytes')
+
+#****************************Experimento buffer bug*********************
+          """
+          bytes_len = int(client_socket.recv(32).decode()) # cantidad de bytes mensaje a recibir
+          # recibir sql por cachos y juntar todo
+          message = []
+          i = 0
+          while i <= bytes_len:  # loop para mostrar bytes por mensaje
+            packet = client_socket.recv(65507)
+            # if not packet: break
+            print(len(packet))
+            message.append(packet)
+            i += 1
+          #message = pickle.loads(b"".join(message))
+          message = b"".join(message)
+          print(len(message))
+          """
+#***********************************************************************
+          message = client_socket.recv(65507) 
+          curve, r, s, Q, m  = pickle.loads(message, encoding='bytes')
           print('message recived...')
           print('\n', verificado_dsa(curve, r, s, Q, m))
-          m = pickle.loads(m, encoding='bytes' )
+          m = pickle.loads(m, encoding='bytes')
 
+          # display the sql
           for row in m:
             for col in row:
                 print(col,end=' ')
+            print('\n')
             print()
 
 
@@ -145,16 +165,9 @@ def client_program(m, host, port): #conexión sin TLS
   client_socket.close()  # close the connection
 
 
-def client_tls(m, hostname, port): 
-  #hostname = "ec2-44-204-5-126.compute-1.amazonaws.com"
-  #hostname = "ec2-35-175-217-227.compute-1.amazonaws.com"
-  #hostname = "ec2-3-91-204-15.compute-1.amazonaws.com"
-  
+def client_tls(m, hostname, port):
 
   context = ssl.create_default_context()
-  #context.loads_verify_locations('C:\\Users\\Enrique\\Downloads\\ec-cacert.pem')
-  #context.loads_verify_locations('C:\\Users\\Enrique\\Downloads\\Cripto Reto\\Client\\new\\ec-cacert-inst4.pem')
-  #context.load_verify_locations(r"C:\Users\Enrique\OneDrive - Instituto Tecnologico y de Estudios Superiores de Monterrey\Documents\Escuela\FJ23\Algebra moderna Cripto\reto\Reto-Git\LiCore-Crypto-IoT\instance 1\ec-cacert-inst1.pem")
   context.load_verify_locations(r'instance 0\ec-cacert-0.pem')
   sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
   print('socket creado')
@@ -163,7 +176,6 @@ def client_tls(m, hostname, port):
   ssock.connect((hostname, port))
   print('Socket version: ', ssock.version())
 
-  #ssock.send('Hola soy el cliente'.encode())
   info_exchange(ssock, m)
 
 
@@ -173,16 +185,14 @@ if __name__ == '__main__':
     #curve = registry.get_curve('brainpoolP256r1')
     dataframe = dataset.iloc[0:5]
 
-    host_public = "ec2-54-164-68-66.compute-1.amazonaws.com"
-    #host_public = "ec-44-204-5-126.compute-1.amazonaws.com"
-    #host_public = socket.gethostname() #aws
-    #host_public = '189.218.7.17'
-    #host_public = 'DESKTOP-L4CCC8B'
-    print(host_public)
+    #host_public = "ec2-54-164-68-66.compute-1.amazonaws.com" # ec2 mine
+    #host_public = "ec-44-204-5-126.compute-1.amazonaws.com"  # teacher
+    host_public = socket.gethostname() #aws
+
     port = 1234
 
-    #client_program(dataframe, host_public, port)
-    client_tls(dataframe, host_public, port)
+    client_program(dataframe, host_public, port)  #no tls
+    #client_tls(dataframe, host_public, port)
 
 
 
