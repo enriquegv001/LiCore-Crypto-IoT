@@ -10,73 +10,92 @@ Recuerda que este código es solo una muestra y puede requerir modificaciones pa
 
 Si estás de acuerdo con estas condiciones, siéntete libre de utilizar este código y disfrutar de sus beneficios. 
 
-==============================================================================================================================================================================
-## 2. Los requisitos de instalación.
+## Los requisitos de instalación.
 ## Dependencias
 - Python 3.7
 - Librería `socket`
 - Librería `ssl`
 - Librería `tinyec`
 - Librería `pandas`
+- Librería `pickle`
+- Librería `secrets`
+- Librería `hashlib`
+- Librería `mysql.connector`
+- Librería `time`
+
 
 ## Instalación
-1. Clona el repositorio.
+1. Clona del repositorio.
+2. Abre la carpeta de `Client-Server` 
 
 ## Uso
-1. Corre el código de `ecdsa_server.py`
-2. Corre el código de `ecdsa_client.py` e ingresa la decisión
-3. En caso de querer limpiar la base de datos correr el código `ecdsa_client.py`, para su creación nuevamente
+1. Crea una instancia AWS EC2 siguiendo tutorial https://docs.aws.amazon.com/es_es/AWSEC2/latest/UserGuide/EC2_GetStarted.html
+2. Crea los certificados CA (solo el 5to paso del tutorial): https://www.golinuxcloud.com/openssl-generate-ecc-certificate/#5_Create_CA_certificate_with_ECC_Key
+3. Configura el el código de `ecdsa_server.py` para ingresar los certificados de CA y su llave privada
+4. Crea un auditor Rasbperry en una Máquina Virtual https://roboticsbackend.com/install-raspbian-desktop-on-a-virtual-machine-virtualbox/#Install_VirtualBox
+5. Compartir a través de ssh certificado a máquina virual del auditor
+6. Cambia en código de `ecdsa_client.py` la variable `host_public` a la ip correspondiente a la de la instancia EC2
+7. ingresa la decisión de `Enviar(F)` o `Recibir(V)`
+   
+Un ejemplo se puede observar en https://youtu.be/dcRZlVgVFWk
 
-    Un ejemplo se puede observar en https://youtu.be/dcRZlVgVFWk
-==============================================================================================================================================================================
-## 3. Descripción de programa
----. Es decir, cómo construyeron esas funciones y cómo se ocupan. La diferencia con el reporte es que en este último indicarán en dónde usan lo que programaron.
-# README del Código del Componente de Cliente
+En caso de querer limpiar la base de datos correr el código `Complementary code/ecdsa_client.py`, para su creación nuevamente
 
-Este repositorio contiene el código del componente de cliente en Python. El código correspondiente se encuentra en el archivo `ecdsa_client.py`.
+## Descripción de programa
+Este repositorio en Python proporcionado es un programa Cliente Servidor que establece una conexión utilizando sockets y protocolo TLS. El programa permite enviar y recibir mensajes a través  la firma y verificación de datos utilizando el algoritmo EC-DSA (Elliptic Curve Digital Signature Algorithm).
 
-El componente de cliente implementa el algoritmo EC-DSA (Elliptic Curve Digital Signature Algorithm) para firmar y verificar datos utilizando criptografía de curva elíptica. Además, incluye funcionalidad para intercambiar información con un servidor a través de sockets.
+A continuación se explica brevemente cada una de las funciones y secciones del código:
+
+[comment]: <> (#### `ecdsa_server.py`)
+
+ 1. Bibliotecas utilizadas
+    El código utiliza las siguientes bibliotecas:
+    
+    - `socket`: Proporciona una interfaz de red de bajo nivel para la programación de sockets.
+    - `ssl`: Permite la encriptación SSL/TLS para una comunicación segura.
+    - `tinyec`: Una biblioteca para operaciones de criptografía de curva elíptica.
+    - `pickle`: Biblioteca de serialización utilizada para la serialización de objetos.
+    - `secrets`: Genera números aleatorios seguros.
+    - `hashlib`: Proporciona varios algoritmos de hash.
+    - `pandas`: Biblioteca para la manipulación y análisis de datos.
+    - `mysql.connector`: Biblioteca de conexión para bases de datos MySQL.
+    - `time`: Proporciona funciones para operaciones relacionadas con el tiempo.
+   
+2. Definición de funciones:
+   - `alg_euc_ext(a, b)`: Implementa el algoritmo de Euclides extendido para obtener el inverso de un número en un grupo dado.
+   - `firmado_dsa(m)`: Realiza el proceso de firma digital utilizando el algoritmo EC-DSA.
+   - `firmado_df(df)`: Aplica el proceso de firma digital a un DataFrame de pandas, generando firmas para cada registro.
+   - `verificado_dsa(curve, r, s, Q, m)`: Verifica la firma digital de un mensaje utilizando el algoritmo EC-DSA.
+   - `ver_df(a)`: Realiza la verificación de firma para cada registro en una lista de firmas.
+   - `info_exchange(client_socket, dataframe)`: Función principal que maneja el intercambio de información entre el cliente y el servidor.
+
+<!---
+#### `ecdsa_client.py`
+
+1. Importación de bibliotecas:
+   - `socket`: Proporciona funciones para la comunicación de red.
+   - `ssl`: Proporciona funciones para el cifrado de comunicaciones utilizando el protocolo SSL/TLS.
+   - `tinyec` y `registry`: Bibliotecas para trabajar con criptografía de curva elíptica.
+   - `pickle`: Permite la serialización y deserialización de objetos Python.
+   - `secrets`: Genera números aleatorios seguros.
+   - `hashlib`: Proporciona funciones de hash criptográfico.
+   - `pandas`: Biblioteca para la manipulación y análisis de datos.
+
+2. Definición de funciones:
+   - `alg_euc_ext(a, b)`: Implementa el algoritmo de Euclides extendido para obtener el inverso de un número en un grupo dado.
+   - `firmado_dsa(m)`: Realiza el proceso de firma digital utilizando el algoritmo EC-DSA.
+   - `firmado_df(df)`: Aplica el proceso de firma digital a un DataFrame de pandas, generando firmas para cada registro.
+   - `verificado_dsa(curve, r, s, Q, m)`: Verifica la firma digital de un mensaje utilizando el algoritmo EC-DSA.
+   - `ver_df(a)`: Realiza la verificación de firma para cada registro en una lista de firmas.
+   - `info_exchange(client_socket, dataframe)`: Función principal que maneja el intercambio de información entre el cliente y el servidor.
+
+3. Funciones `client_program(m, host, port)` y `client_tls(m, hostname, port)`: Estas funciones establecen la conexión con el servidor y llaman a la función `info_exchange` para iniciar el intercambio de información.
+-->
+4. Bloque `if __name__ == '__main__':`: Este bloque se ejecuta cuando el script se ejecuta directamente (no cuando se importa como un módulo). En este caso, carga un conjunto de datos de un archivo CSV, establece el host y el puerto, y llama a la función `client_program` para iniciar la conexión sin TLS o a la función `client_tls` para iniciar la conexión con TLS.
 
 
-2. El código principal consiste en varias funciones que permiten firmar, verificar y enviar datos al servidor. Estas funciones están definidas en el archivo `ecdsa_client.py`.
 
-3. Modifica el script según sea necesario, proporcionando el conjunto de datos y la información del servidor adecuados:
-
-```python
-# Cargar el conjunto de datos
-dataset = pd.read_csv(r'Prosumer_ABC.csv', header=0, sep=";")
-dataframe = dataset.iloc[0:5]
-
-# Establecer el nombre del servidor y el puerto
-hostname = socket.gethostname()
-port = 1234
-
-# Llama a la función adecuada para intercambiar mensajes
-client_program(dataframe, hostname, port)  # Sin TLS
-# client_tls(dataframe, hostname, port)  # Con TLS
-```
-
-4. Ejecuta el script:
-
-```shell
-python ecdsa_client.py
-```
-
-```python
-import socket
-import ssl
-import tinyec
-from tinyec import registry
-import pickle
-import secrets
-import hashlib
-import pandas as pd
-```
-
-5. El script te solicitará acciones: enviar datos (`F`), recibir y verificar datos (`V`), o finalizar el programa. Sigue las indicaciones para interactuar con el servidor.
-==============================================================================================================================================================================
-
-## 4. Sus contactos para poder ser consultados por dudas o potenciales ajustes a realizar.
+## Contactos
 A00831314@tec.mx Paola Sofía Reyes Mancheno; 
 A01197399@tec.mx Diana Paola Cadena Nito; 
 A01275180@tec.mx Alexis Hernández Spinola; 
@@ -84,5 +103,5 @@ A01285041@tec.mx María Fernanda Torres Alcubilla;
 A01705747@tec.mx Enrique García Varela; 
 A01730548@tec.mx Javier Hernández Arellano; 
 
-## 5. Licencia
+## Licencia
 El código en este repositorio está licenciado bajo [Creative Commons Attribution-ShareAlike 4.0 International License (CC BY-SA 4.0)](https://creativecommons.org/licenses/by-sa/4.0/).
