@@ -31,10 +31,10 @@ Si estás de acuerdo con estas condiciones, siéntete libre de utilizar este có
 ## Uso
 1. Crea una instancia AWS EC2 siguiendo tutorial https://docs.aws.amazon.com/es_es/AWSEC2/latest/UserGuide/EC2_GetStarted.html
 2. Crea los certificados CA (solo el 5to paso del tutorial): https://www.golinuxcloud.com/openssl-generate-ecc-certificate/#5_Create_CA_certificate_with_ECC_Key
-3. Configura el el código de `ecdsa_server.py` para ingresar los certificados de CA y su llave privada
+3. Configura el el código de `ecdsa_server.py` para ingresar los certificados de CA y su llave privada. Después corre código en la instancia EC2
 4. Crea un auditor Rasbperry en una Máquina Virtual https://roboticsbackend.com/install-raspbian-desktop-on-a-virtual-machine-virtualbox/#Install_VirtualBox
 5. Compartir a través de ssh certificado a máquina virual del auditor
-6. Cambia en código de `ecdsa_client.py` la variable `host_public` a la ip correspondiente a la de la instancia EC2
+6. Cambia en código de `ecdsa_client.py` la variable `host_public` a la ip correspondiente a la de la instancia EC2 y correlo en la VM
 7. ingresa la decisión de `Enviar(F)` o `Recibir(V)`
    
 Un ejemplo se puede observar en https://youtu.be/dcRZlVgVFWk
@@ -90,9 +90,9 @@ A continuación se explica brevemente cada una de las funciones y secciones del 
    - `info_exchange(client_socket, dataframe)`: Función principal que maneja el intercambio de información entre el cliente y el servidor.
 
 3. Funciones `client_program(m, host, port)` y `client_tls(m, hostname, port)`: Estas funciones establecen la conexión con el servidor y llaman a la función `info_exchange` para iniciar el intercambio de información.
--->
-4. Bloque `if __name__ == '__main__':`: Este bloque se ejecuta cuando el script se ejecuta directamente (no cuando se importa como un módulo). En este caso, carga un conjunto de datos de un archivo CSV, establece el host y el puerto, y llama a la función `client_program` para iniciar la conexión sin TLS o a la función `client_tls` para iniciar la conexión con TLS.
 
+4. Bloque `if __name__ == '__main__':`: Este bloque se ejecuta cuando el script se ejecuta directamente (no cuando se importa como un módulo). En este caso, carga un conjunto de datos de un archivo CSV, establece el host y el puerto, y llama a la función `client_program` para iniciar la conexión sin TLS o a la función `client_tls` para iniciar la conexión con TLS.
+-->
 
 
 ## Contactos
