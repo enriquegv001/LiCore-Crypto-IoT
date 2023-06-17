@@ -141,7 +141,8 @@ def info_exchange(conn):
       res = pickle.dumps(res, protocol=4)
   
       message = pickle.dumps(firmado_dsa(curve, res), protocol=4)
-
+#*************************Expermiento buffer bug*********************
+      """
       #Si es mensaje mayor el que el buffer size entonces dividir en n cantidades
       bytes_len = len(message)
       if bytes_len <= 65507:
@@ -152,14 +153,16 @@ def info_exchange(conn):
 
       #se envía por partes de tamaño igual
       conn.send(message[:65507])
-      for i in range(1, n+1):
-         m_inter = message[65507*i:65507*(i+1)] #selecciona intermedios
+      for j in range(1, n+1):
+         m_inter = message[65507*j:65507*(j+1)] #selecciona intermedios
          conn.send(m_inter)
       conn.send(message[65507*n:])
       print('message sended')
+      """
+#*************************************************************************
 
 
-     # conn.send(message)  # enviar firmado
+      conn.send(message)  # enviar firmado
 
     else: #terminar iteraciones
       i=i +1
