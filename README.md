@@ -76,35 +76,12 @@ A continuación se explica cada una de las funciones y secciones del código:
    - `client_tls(m, hostname, port)`: Creación de socket del cliente aplicando los certificados de la CA del protocólo TLS. Para el cual se requiere tener el archivo .pem generado dentro del servidor. El método seguro para enviar el docuemnto es a través de ssh.
 
 
-<!---
-#### `ecdsa_client.py`
-
-1. Importación de bibliotecas:
-   - `socket`: Proporciona funciones para la comunicación de red.
-   - `ssl`: Proporciona funciones para el cifrado de comunicaciones utilizando el protocolo SSL/TLS.
-   - `tinyec` y `registry`: Bibliotecas para trabajar con criptografía de curva elíptica.
-   - `pickle`: Permite la serialización y deserialización de objetos Python.
-   - `secrets`: Genera números aleatorios seguros.
-   - `hashlib`: Proporciona funciones de hash criptográfico.
-   - `pandas`: Biblioteca para la manipulación y análisis de datos.
-
-2. Definición de funciones:
-   - `alg_euc_ext(a, b)`: Implementa el algoritmo de Euclides extendido para obtener el inverso de un número en un grupo dado.
-   - `firmado_dsa(m)`: Realiza el proceso de firma digital utilizando el algoritmo EC-DSA.
-   - `firmado_df(df)`: Aplica el proceso de firma digital a un DataFrame de pandas, generando firmas para cada registro.
-   - `verificado_dsa(curve, r, s, Q, m)`: Verifica la firma digital de un mensaje utilizando el algoritmo EC-DSA.
-   - `ver_df(a)`: Realiza la verificación de firma para cada registro en una lista de firmas.
-   - `info_exchange(client_socket, dataframe)`: Función principal que maneja el intercambio de información entre el cliente y el servidor.
-
-3. Funciones `client_program(m, host, port)` y `client_tls(m, hostname, port)`: Estas funciones establecen la conexión con el servidor y llaman a la función `info_exchange` para iniciar el intercambio de información.
-
-4. Bloque `if __name__ == '__main__':`: Este bloque se ejecuta cuando el script se ejecuta directamente (no cuando se importa como un módulo). En este caso, carga un conjunto de datos de un archivo CSV, establece el host y el puerto, y llama a la función `client_program` para iniciar la conexión sin TLS o a la función `client_tls` para iniciar la conexión con TLS.
--->
-
 ## Implementación de fuciones
 El programa consiste de dos códigos generales, el primero es el de `ecdsa_server.py` con el que se estan dando los certificados, al estos estar siendo generados en una instancia de ec2 nueva, la ruta de los mismos ya esta automática. Por lo que se etará levantando el servidor después de haber corrido `server_tls(host, port)`, con el que se estará conectando despues de haber corrido `client_tls(m, hostname, port)`. El proceso de enviado de información va a diferenciarse en cada una de las partes, pero ambos utilizan `info_exchange()` con el que se estará ingresando la conexión que será de utilidad para el momento de enviar y recibir los datos.
 
-Con ello se mostrá en pantalla un menú para el cliente sobre la decisión a tomarl. El debe establecer si estará enviando o recibiendo los datos almacenados en la ruta que se establecio de base de datos inical de .csv para el cliente y con la dirección del servidor de SQL para el servidor.
+Con ello se mostrá en pantalla un menú para el cliente sobre la decisión a tomarl. El debe establecer si estará enviando o recibiendo los datos almacenados en la ruta que se establecio de base de datos inical de .csv para el cliente y con la dirección del servidor de SQL para el servidor. 
+
+Dependiendo de la decisión, al compoentne que le corresponda enviar la información aplciará la función de `firmado_df(df)`, la cual a su vez estará utilizando `alg_euc_ext(a, b)`, `firmado_dsa(m)` y `deterministic_k(generator_order, secret_exponent, val , hash_f)`. Desepués se enviará los datos y al momento de recibirlos, los cual se realiza por medio de la misma función de `info_exchange()`, estos estarán siendo verificados con la función de `ver_df(a)` y se desplegarán en la pantalla.
 
 ## Contactos
 A00831314@tec.mx Paola Sofía Reyes Mancheno; 
