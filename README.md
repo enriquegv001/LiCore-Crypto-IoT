@@ -1,4 +1,4 @@
-# README LiCore-Crypto-IoT
+# Documentación LiCore-Crypto-IoT
 ## Condiciones de uso
 Al utilizar este código, aceptas cumplir con las siguientes condiciones:
 
