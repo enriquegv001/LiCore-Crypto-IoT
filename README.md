@@ -12,6 +12,7 @@ Si estás de acuerdo con estas condiciones, siéntete libre de utilizar este có
 
 
 ## Requeriminetos de uso
+
 ### Los requisitos de instalación.
 #### Dependencias
 - Python 3.7
@@ -43,6 +44,11 @@ Un ejemplo se puede observar en https://youtu.be/dcRZlVgVFWk
 En caso de querer limpiar la base de datos correr el código `Complementary code/ecdsa_client.py`, para su creación nuevamente
 
 ## Descripción de programa
+Este repositorio cuenta con las carpetas de `Artículo y presentación` dónde se puede observar el trabajo realizado para la matería, así como `Client_server` la cual será la carpeta a descargar, ya que en ella vienen los códigos que incluyen todo el funcionamiento de los componentes correspodinetes al auditor `ecdsa_client.py`, el código del servidor `ecdsa_server.py`, así como la base de datos `Prosumer_ABC.csv` y la carpeta de `instance 0` que incluye a las llaves para poder realizar la conexión entre las máquinas virtuales del protoyipo, sin embargo, será necesario generar unos nuevos, los pasos a seguir en instalación.
+
+También, esta la carpeta de `Complementary code` en la que se puede obtener los códigos de prueba que se utilizaron para resolver las distintas funciones del programa por separado. En dicha carpeta se encuentra  `ECDSA_RFC_vectores_prueba.ipynb` el cual contiene dos métodos de firmado y verificación, uno el cual esta comprobado que se adapta a los requisitos del informe https://www.rfc-editor.org/rfc/rfc6979#appendix-A.2.5 y otro que es el acutual y que hasta el momento solo se tiene el determinístico para obtener k. Así mismo, estan los docuemntos de `clientsocket5.py` y `socketserver.py` en los que se establece las primeras conexiones por medio de certificados TLS. 
+
+
 Este repositorio en Python proporcionado es un programa Cliente Servidor que establece una conexión utilizando sockets y protocolo TLS. El programa permite enviar y recibir mensajes a través  la firma y verificación de datos utilizando el algoritmo EC-DSA (Elliptic Curve Digital Signature Algorithm).
 
 A continuación se explica cada una de las funciones y secciones del código:
