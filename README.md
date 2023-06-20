@@ -102,8 +102,9 @@ A continuación se explica cada una de las funciones y secciones del código:
 -->
 
 ## Implementación de fuciones
-El programa consiste de dos códigos generales, el primero es el de `ecdsa_server.py` con el que se estan dando los certificados, al estos estar siendo generados en una instancia de ec2 nueva, la ruta de los mismos ya esta automática. Por lo que se etará levantando el servidor después de haber corrido 
+El programa consiste de dos códigos generales, el primero es el de `ecdsa_server.py` con el que se estan dando los certificados, al estos estar siendo generados en una instancia de ec2 nueva, la ruta de los mismos ya esta automática. Por lo que se etará levantando el servidor después de haber corrido `server_tls(host, port)`, con el que se estará conectando despues de haber corrido `client_tls(m, hostname, port)`. El proceso de enviado de información va a diferenciarse en cada una de las partes, pero ambos utilizan `info_exchange()` con el que se estará ingresando la conexión que será de utilidad para el momento de enviar y recibir los datos.
 
+Con ello se mostrá en pantalla un menú para el cliente sobre la decisión a tomarl. El debe establecer si estará enviando o recibiendo los datos almacenados en la ruta que se establecio de base de datos inical de .csv para el cliente y con la dirección del servidor de SQL para el servidor.
 
 ## Contactos
 A00831314@tec.mx Paola Sofía Reyes Mancheno; 
