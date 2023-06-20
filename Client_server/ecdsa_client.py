@@ -30,6 +30,47 @@ def alg_euc_ext(a,b): # obtener inverso de a, del grupo b
   d = a; x = x2; y = y2 # y es el inverso 
   return d,x,y
     
+
+#Deterministico de k, modificación del código por:
+#https://pycoin.readthedocs.io/en/latest/_modules/pycoin/ecdsa/rfc6979.html#:~:text=%5Bdocs%5D%20def%20deterministic_generate_k%28generator_order%2C%20secret_exponent%2C%20val%2C%20hash_f%3Dhashlib.sha256%29%3A%20%22%22%22%20%3Aparam,%2B%20b%27x00%27%2C%20hash_f%29.digest%28%29%20v%20%3D%20hmac.new%28k%2C%20v%2C%20hash_f%29.digest%28%29
+import hashlib
+import hmac
+
+if hasattr(1, "bit_length"):
+    def bit_length(v):
+        return v.bit_length()
+else:
+    def bit_length(self):
+        s = bin(self)  # binary representation:  bin(-37) --> '-0b100101'
+        s = s.lstrip('-0b')  # remove leading zeros and minus sign
+        return len(s)  # len('100101') --> 6
+
+def deterministic_k(generator_order, secret_exponent, val , hash_f):
+    n = generator_order
+    bln = bit_length(n)
+    order_size = (bln + 7) // 8
+    hash_size = hash_f().digest_size
+    v = b'\x01' * hash_size
+    k = b'\x00' * hash_size
+    priv_key = int.to_bytes(secret_exponent, byteorder = 'big', length=order_size)
+    h1 = int(hashlib.sha256(val).hexdigest(), 16)
+    h1 = h1.to_bytes(32, 'big')
+    k = hmac.new(k, v + b'\x00' + priv_key + h1, hash_f).digest()
+    v = hmac.new(k, v, hash_f).digest()
+    k = hmac.new(k, v + b'\x01' + priv_key + h1, hash_f).digest()
+    v = hmac.new(k, v, hash_f).digest()
+
+    while 1:
+        t = bytearray()
+        while len(t) < order_size:
+            v = hmac.new(k, v, hash_f).digest()
+            t.extend(v)
+        k1 = int.from_bytes(bytes(t), 'big')
+        if k1 >= 1 and k1 < n:
+            return k1
+
+
+# firmado ecdsa para mensajes encodeados
 def firmado_dsa(m):
   curve = registry.get_curve('brainpoolP256r1')
   # Generación de clave
@@ -44,7 +85,8 @@ def firmado_dsa(m):
   s = 0
 
   while r == 0 or s == 0:
-    k = secrets.randbelow(q)
+    #k = secrets.randbelow(q)
+    k = deterministic_k(q, x, m , hashlib.sha256)
     kP = k * P
     r = kP.x % q 
     l = alg_euc_ext(q, k)[2] # inverso de k
