@@ -69,12 +69,22 @@ A continuación se explica cada una de las funciones y secciones del código:
    - `firmado_df(df)`: Aplica el proceso de firma digital a un DataFrame de pandas, generando firmas para cada registro.
    - `verificado_dsa(curve, r, s, Q, m)`: Verifica la firma digital de un mensaje utilizando el algoritmo EC-DSA.
    - `ver_df(a)`: Realiza la verificación de firma para cada registro en una lista de firmas.
+   - `bit_length()`: para objetos enteros. Si es así, define una función bit_length(v) que simplemente devuelve v.bit_length(). Si no existe bit_length() en el objeto int, se define una función bit_length(self) que calcula la longitud en bits del número entero mediante la conversión a una representación binaria y contando los dígitos binarios.
+   - `deterministic_k(a)`: utiliza el orden del generador para determinar el tamaño necesario en bytes para representar el orden. Luego, se inicializan variables y se realizan operaciones de hash y autenticación de mensajes basadas en HMAC para generar el valor determinístico k dentro del rango [1, n), donde n es el orden del generador.
    - `info_exchange(client_socket, dataframe)`: Función principal que maneja el intercambio de información entre el cliente y el servidor.
    - `server_program(host, port)`: Creación de socket del servidor respecto a una ip privada y un puerto
    - `server_tls(host, port)`: Creación de socket del servidor, a través de certificados CA y la llave públca del protocólo TLS.
    - `client_program(m, host, port)`: Creación de socket del cliente de forma local por medio de por medio de ip pública del servidor, así como su puerto abierto
    - `client_tls(m, hostname, port)`: Creación de socket del cliente aplicando los certificados de la CA del protocólo TLS. Para el cual se requiere tener el archivo .pem generado dentro del servidor. El método seguro para enviar el docuemnto es a través de ssh.
 
+#### clases dentro de vectores de prueba:
+  - `MonInt`:proporciona una implementación para realizar operaciones aritméticas modulares, incluyendo suma, resta, multiplicación, potenciación y división, así como métodos para obtener el inverso modular y verificar si el objeto ModInt es igual a cero.
+  - `Curve`: proporciona una forma de representar los parámetros de una curva elíptica de Weierstrass corta sobre un campo finito. También incluye métodos para obtener el punto en el infinito y el punto base de la curva.
+  - `CurvePoint`: proporciona métodos para trabajar con puntos en una curva elíptica. Incluye funcionalidades como verificación de igualdad de puntos, suma de puntos y multiplicación por escalar.
+  - `EcdsaSigner` representa una clave privada capaz de crear firmas ECDSA, mientras que la clase EcdsaVerifier representa una clave pública capaz de verificar firmas ECDSA. Ambas clases utilizan objetos de clase Curve y CurvePoint para realizar los cálculos y verificaciones necesarios en el esquema de firma ECDSA.
+  - Funciones:
+           - ecdsa_modint_from_hash toma un valor hash de un mensaje y lo deriva en un entero módulo n para su uso en el esquema de firma ECDSA (Elliptic Curve Digital Signature Algorithm).
+           - 
 
 ## Implementación de fuciones
 El programa consiste de dos códigos generales, el primero es el de `ecdsa_server.py` con el que se estan dando los certificados, al estos estar siendo generados en una instancia de ec2 nueva, la ruta de los mismos ya esta automática. Por lo que se etará levantando el servidor después de haber corrido `server_tls(host, port)`, con el que se estará conectando despues de haber corrido `client_tls(m, hostname, port)`. El proceso de enviado de información va a diferenciarse en cada una de las partes, pero ambos utilizan `info_exchange()` con el que se estará ingresando la conexión que será de utilidad para el momento de enviar y recibir los datos.
