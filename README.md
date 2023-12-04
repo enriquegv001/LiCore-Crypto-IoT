@@ -100,12 +100,17 @@ Con ello se mostrá en pantalla un menú para el cliente sobre la decisión a to
 Dependiendo de la decisión, al compoentne que le corresponda enviar la información aplciará la función de `firmado_df(df)`, la cual a su vez estará utilizando `alg_euc_ext(a, b)`, `firmado_dsa(m)` y `deterministic_k(generator_order, secret_exponent, val , hash_f)`. Desepués se enviará los datos y al momento de recibirlos, los cual se realiza por medio de la misma función de `info_exchange()`, estos estarán siendo verificados con la función de `ver_df(a)` y se desplegarán en la pantalla.
 
 ## Contactos
-A00831314@tec.mx Paola Sofía Reyes Mancheno; 
-A01197399@tec.mx Diana Paola Cadena Nito; 
-A01275180@tec.mx Alexis Hernández Spinola; 
-A01285041@tec.mx María Fernanda Torres Alcubilla; 
-A01705747@tec.mx Enrique García Varela; 
-A01730548@tec.mx Javier Hernández Arellano; 
+A01705747@tec.mx Enrique García Varela
+
+A00831314@tec.mx Paola Sofía Reyes Mancheno
+
+A01197399@tec.mx Diana Paola Cadena Nito
+
+A01275180@tec.mx Alexis Hernández Spinola
+
+A01285041@tec.mx María Fernanda Torres Alcubilla
+ 
+A01730548@tec.mx Javier Hernández Arellano
 
 ## Licencia
 El código en este repositorio está licenciado bajo [Creative Commons Attribution-ShareAlike 4.0 International License (CC BY-SA 4.0)](https://creativecommons.org/licenses/by-sa/4.0/).
