@@ -39,7 +39,7 @@ Si estás de acuerdo con estas condiciones, siéntete libre de utilizar este có
 9. Cambia en código de `ecdsa_client.py` la variable `host_public` a la ip correspondiente a la de la instancia EC2 y correlo en la VM
 10. ingresa la decisión de `Enviar(F)` o `Recibir(V)`
    
-Un ejemplo se puede observar en el [Video](https://youtu.be/dcRZlVgVFWk)
+Un ejemplo se puede observar en el [Video](https://youtu.be/h-keUv-cJzo)
 
 En caso de querer limpiar la base de datos correr el código `Complementary code/ecdsa_client.py`, para su creación nuevamente
 
