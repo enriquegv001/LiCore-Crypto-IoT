@@ -12,6 +12,7 @@ Si estás de acuerdo con estas condiciones, siéntete libre de utilizar este có
 
 
 ## Requeriminetos de uso
+
 ### Los requisitos de instalación.
 #### Dependencias
 - Python 3.7
@@ -38,11 +39,16 @@ Si estás de acuerdo con estas condiciones, siéntete libre de utilizar este có
 9. Cambia en código de `ecdsa_client.py` la variable `host_public` a la ip correspondiente a la de la instancia EC2 y correlo en la VM
 10. ingresa la decisión de `Enviar(F)` o `Recibir(V)`
    
-Un ejemplo se puede observar en https://youtu.be/dcRZlVgVFWk
+Un ejemplo se puede observar en el [Video](https://youtu.be/h-keUv-cJzo)
 
 En caso de querer limpiar la base de datos correr el código `Complementary code/ecdsa_client.py`, para su creación nuevamente
 
 ## Descripción de programa
+Este repositorio cuenta con las carpetas de `Artículo y presentación` dónde se puede observar el trabajo realizado para la matería, así como `Client_server` la cual será la carpeta a descargar, ya que en ella vienen los códigos que incluyen todo el funcionamiento de los componentes correspodinetes al auditor `ecdsa_client.py`, el código del servidor `ecdsa_server.py`, así como la base de datos `Prosumer_ABC.csv` y la carpeta de `instance 0` que incluye a las llaves para poder realizar la conexión entre las máquinas virtuales del protoyipo, sin embargo, será necesario generar unos nuevos, los pasos a seguir en instalación.
+
+También, esta la carpeta de `Complementary code` en la que se puede obtener los códigos de prueba que se utilizaron para resolver las distintas funciones del programa por separado. En dicha carpeta se encuentra  `ECDSA_RFC_vectores_prueba.ipynb` el cual contiene dos métodos de firmado y verificación, uno el cual esta comprobado que se adapta a los requisitos del informe https://www.rfc-editor.org/rfc/rfc6979#appendix-A.2.5 y otro que es el acutual y que hasta el momento solo se tiene el determinístico para obtener k. Así mismo, estan los docuemntos de `clientsocket5.py` y `socketserver.py` en los que se establece las primeras conexiones por medio de certificados TLS. 
+
+
 Este repositorio en Python proporcionado es un programa Cliente Servidor que establece una conexión utilizando sockets y protocolo TLS. El programa permite enviar y recibir mensajes a través  la firma y verificación de datos utilizando el algoritmo EC-DSA (Elliptic Curve Digital Signature Algorithm).
 
 A continuación se explica cada una de las funciones y secciones del código:
@@ -94,12 +100,17 @@ Con ello se mostrá en pantalla un menú para el cliente sobre la decisión a to
 Dependiendo de la decisión, al compoentne que le corresponda enviar la información aplciará la función de `firmado_df(df)`, la cual a su vez estará utilizando `alg_euc_ext(a, b)`, `firmado_dsa(m)` y `deterministic_k(generator_order, secret_exponent, val , hash_f)`. Desepués se enviará los datos y al momento de recibirlos, los cual se realiza por medio de la misma función de `info_exchange()`, estos estarán siendo verificados con la función de `ver_df(a)` y se desplegarán en la pantalla.
 
 ## Contactos
-A00831314@tec.mx Paola Sofía Reyes Mancheno; 
-A01197399@tec.mx Diana Paola Cadena Nito; 
-A01275180@tec.mx Alexis Hernández Spinola; 
-A01285041@tec.mx María Fernanda Torres Alcubilla; 
-A01705747@tec.mx Enrique García Varela; 
-A01730548@tec.mx Javier Hernández Arellano; 
+A01705747@tec.mx Enrique García Varela
+
+A00831314@tec.mx Paola Sofía Reyes Mancheno
+
+A01197399@tec.mx Diana Paola Cadena Nito
+
+A01275180@tec.mx Alexis Hernández Spinola
+
+A01285041@tec.mx María Fernanda Torres Alcubilla
+ 
+A01730548@tec.mx Javier Hernández Arellano
 
 ## Licencia
 El código en este repositorio está licenciado bajo [Creative Commons Attribution-ShareAlike 4.0 International License (CC BY-SA 4.0)](https://creativecommons.org/licenses/by-sa/4.0/).
