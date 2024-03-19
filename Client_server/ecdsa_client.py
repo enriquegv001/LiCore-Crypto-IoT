@@ -498,7 +498,7 @@ def client_program(m, host, port): #conexión sin TLS
 def client_tls(m, hostname, port):
 
   context = ssl.create_default_context()
-  context.load_verify_locations(r'instance 0\ec-cacert-0.pem')
+  context.load_verify_locations(r'instance 0\ec-cacert-0.pem') #change to your cert path
   sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
   print('socket creado')
   ssock = context.wrap_socket(sock, server_hostname=hostname)
